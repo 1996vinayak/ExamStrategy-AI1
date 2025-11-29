@@ -1,7 +1,11 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { UploadedFile, AnalysisResult } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+let ai: GoogleGenAI | null = null;
+
+export const initializeAI = (apiKey: string) => {
+  ai = new GoogleGenAI({ apiKey });
+};
 
 // Helper to clean markdown code blocks from the response
 const cleanJsonString = (str: string): string => {
@@ -11,6 +15,9 @@ const cleanJsonString = (str: string): string => {
 export const analyzeExamData = async (
   files: UploadedFile[]
 ): Promise<AnalysisResult> => {
+  if (!ai) {
+    throw new Error("Please enter your Gemini API Key first.");
+  }
   
   const syllabusFiles = files.filter(f => f.type === 'syllabus');
   const pyqFiles = files.filter(f => f.type === 'pyq');

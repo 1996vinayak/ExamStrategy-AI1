@@ -2,14 +2,23 @@ import React, { useState } from 'react';
 import { FileUploadSection } from './components/FileUploadSection';
 import { AnalysisDashboard } from './components/AnalysisDashboard';
 import { UploadedFile, AnalysisResult, AnalysisStatus } from './types';
-import { analyzeExamData } from './services/geminiService';
-import { Loader2, Sparkles, AlertCircle } from 'lucide-react';
+import { analyzeExamData, initializeAI } from './services/geminiService';
+import { Loader2, Sparkles, AlertCircle, Key } from 'lucide-react';
 
 const App: React.FC = () => {
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [status, setStatus] = useState<AnalysisStatus>(AnalysisStatus.IDLE);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [apiKey, setApiKey] = useState<string>('');
+  const [apiKeySet, setApiKeySet] = useState<boolean>(false);
+
+  const handleSetApiKey = () => {
+    if (apiKey.trim()) {
+      initializeAI(apiKey.trim());
+      setApiKeySet(true);
+    }
+  };
 
   const handleAnalyze = async () => {
     setStatus(AnalysisStatus.ANALYZING);
@@ -50,9 +59,9 @@ const App: React.FC = () => {
                 
                 <button
                     onClick={handleAnalyze}
-                    disabled={status === AnalysisStatus.ANALYZING || files.length < 2}
+                    disabled={status === AnalysisStatus.ANALYZING || files.length < 2 || !apiKeySet}
                     className={`flex items-center gap-2 px-6 py-2.5 rounded-full font-medium transition-all shadow-sm ${
-                        status === AnalysisStatus.ANALYZING || files.length < 2
+                        status === AnalysisStatus.ANALYZING || files.length < 2 || !apiKeySet
                         ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
                         : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-indigo-200'
                     }`}
@@ -89,6 +98,41 @@ const App: React.FC = () => {
                     <h2 className="text-3xl font-serif font-bold text-slate-900 mb-4">
                         Predict the Unpredictable
                     </h2>
+                    
+                    {/* API Key Input */}
+                    {!apiKeySet ? (
+                      <div className="mb-8 w-full max-w-md">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Key size={16} className="text-indigo-600" />
+                          <label className="text-sm font-medium text-slate-700">Enter your Gemini API Key</label>
+                        </div>
+                        <div className="flex gap-2">
+                          <input
+                            type="password"
+                            value={apiKey}
+                            onChange={(e) => setApiKey(e.target.value)}
+                            placeholder="AIza..."
+                            className="flex-1 px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          />
+                          <button
+                            onClick={handleSetApiKey}
+                            disabled={!apiKey.trim()}
+                            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-slate-300"
+                          >
+                            Set Key
+                          </button>
+                        </div>
+                        <p className="text-xs text-slate-400 mt-2">
+                          Get your free API key from <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">Google AI Studio</a>
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="mb-6 flex items-center gap-2 text-green-600 text-sm">
+                        <Key size={16} />
+                        <span>API Key set ✓</span>
+                      </div>
+                    )}
+                    
                     <p className="text-slate-500 max-w-lg leading-relaxed mb-8">
                         Upload your <strong>Syllabus</strong> and <strong>Previous Year Question Papers (PYQs)</strong> on the left panel. 
                         Our AI will analyze 10+ years of trends to tell you exactly what might appear in this year's exam.
