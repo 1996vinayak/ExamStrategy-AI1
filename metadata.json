@@ -1,0 +1,5 @@
+{
+  "name": "ExamStrategy AI",
+  "description": "An AI-powered exam preparation assistant that analyzes previous year question papers and syllabi to predict question patterns, topic weightage, and potential twists for Indian competitive exams.",
+  "requestFramePermissions": []
+}
