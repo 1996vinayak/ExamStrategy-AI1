@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { AnalysisResult, HistoricalOccurrence } from '../types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { TrendingUp, Brain, Target, Calendar, ChevronLeft, ChevronRight, Lightbulb, CheckCircle, FileText, X, Zap, BookOpen } from 'lucide-react';
+import { TrendingUp, Brain, Target, Calendar, ChevronLeft, ChevronRight, Lightbulb, CheckCircle, FileText, X, Zap, BookOpen, Download } from 'lucide-react';
+import { generatePDF } from '../utils/pdfGenerator';
 
 interface AnalysisDashboardProps {
   data: AnalysisResult;
@@ -73,7 +74,16 @@ export const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ data }) =>
 
       {/* Executive Summary */}
       <section>
-        <h2 className="text-3xl font-serif font-bold text-slate-900 mb-6 border-b border-slate-200 pb-4">Analysis Report</h2>
+        <div className="flex justify-between items-center mb-6 border-b border-slate-200 pb-4">
+          <h2 className="text-3xl font-serif font-bold text-slate-900">Analysis Report</h2>
+          <button
+            onClick={() => generatePDF(data)}
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-sm"
+          >
+            <Download size={18} />
+            Download PDF
+          </button>
+        </div>
         <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 prose prose-slate max-w-none">
             <React.Fragment>
               {data.overview.split('\n').map((line, i) => (
